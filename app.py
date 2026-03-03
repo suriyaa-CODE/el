@@ -4,7 +4,7 @@ from rag_utils import load_documents, create_faiss_index, search
 from PIL import Image
 
 # Fetch API Key from Streamlit Secrets
-API_KEY = st.secrets["GEMINI_API_KEY"]
+API_KEY = "AIzaSyAzGYdqYrl7TQbsrEjiMilyafG-ETnlxyk"
 genai.configure(api_key=API_KEY)
 
 model = genai.GenerativeModel("gemini-flash-latest")
