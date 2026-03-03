@@ -12,8 +12,18 @@ if not API_KEY:
 
 genai.configure(api_key=API_KEY)
 
-# Use Gemini 1.5 Flash
-model = genai.GenerativeModel("gemini-1.5-flash-latest")
+# Use Gemini Pro (more likely to be supported in older v1beta environments)
+try:
+    model = genai.GenerativeModel("gemini-pro")
+except Exception as e:
+    st.error(f"Failed to initialize gemini-pro: {e}")
+    # List available models to help debugging
+    try:
+        models = [m.name for m in genai.list_models()]
+        st.info(f"Available models: {models}")
+    except:
+        pass
+    st.stop()
 
 docs = load_documents("data/election_knowledge.txt")
 index, embeddings = create_faiss_index(docs)
