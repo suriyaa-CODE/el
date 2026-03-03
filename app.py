@@ -7,20 +7,13 @@ from PIL import Image
 API_KEY = st.secrets.get("GEMINI_API_KEY")
 
 if not API_KEY:
-    import os
-    cwd = os.getcwd()
-    secrets_path = os.path.join(cwd, ".streamlit", "secrets.toml")
-    exists = os.path.exists(secrets_path)
-    
-    available_keys = list(st.secrets.keys()) if hasattr(st.secrets, "keys") else "No keys found"
-    st.error(f"Missing GEMINI_API_KEY. Available secret keys: {available_keys}")
-    st.info(f"Current Working Directory: `{cwd}`")
-    st.info(f"Looking for secrets at: `{secrets_path}` (Exists: {exists})")
+    st.error("Missing GEMINI_API_KEY. Please add it to .streamlit/secrets.toml or Streamlit Cloud Secrets.")
     st.stop()
 
 genai.configure(api_key=API_KEY)
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+# Use Gemini 1.5 Flash
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
 docs = load_documents("data/election_knowledge.txt")
 index, embeddings = create_faiss_index(docs)
