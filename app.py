@@ -23,20 +23,33 @@ if len(API_KEY) < 30:
 
 genai.configure(api_key=API_KEY)
 
-# Use Gemini Pro (Better compatibility for older library versions)
-try:
-    model = genai.GenerativeModel("gemini-pro")
-except Exception as e:
-    st.error(f"Failed to initialize gemini-pro: {e}")
-    st.stop()
-
-# Helper to debug model names if needed
-if "DEBUG_MODELS" in st.query_params:
+# Model Selection and Discovery
+def get_available_models():
     try:
-        available_models = [m.name for m in genai.list_models()]
-        st.info(f"Available models: {available_models}")
+        return [m.name.replace("models/", "") for m in genai.list_models() if "generateContent" in m.supported_generation_methods]
     except Exception as e:
         st.error(f"Could not list models: {e}")
+        return []
+
+available_models = get_available_models()
+
+# Try to default to 1.5-flash, fallback to pro, or the first available
+default_model = "gemini-1.5-flash"
+if default_model not in available_models:
+    if "gemini-pro" in available_models:
+        default_model = "gemini-pro"
+    elif available_models:
+        default_model = available_models[0]
+
+with st.sidebar:
+    if available_models:
+        selected_model = st.selectbox("Select Model", available_models, index=available_models.index(default_model) if default_model in available_models else 0)
+    else:
+        st.error("No supported models found for this API Key.")
+        st.stop()
+
+# Initialize the selected model
+model = genai.GenerativeModel(selected_model)
 
 docs = load_documents("data/election_knowledge.txt")
 index, embeddings = create_faiss_index(docs)
