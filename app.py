@@ -80,12 +80,13 @@ docs, index = init_rag()
 # 5. CORE FUNCTIONS
 def show_party_symbol(text, container):
     party_map = {
+        "AIADMK": "admk.jpg", 
+        "ADMK": "admk.jpg", 
         "BJP": "bjp.png", 
         "Congress": "congress.png", 
-        "DMK": "dmk.png", 
-        "ADMK": "admk.jpg", 
         "TVK": "tvk.png", 
-        "NTK": "ntk.jpg"
+        "NTK": "ntk.jpg",
+        "DMK": "dmk.png"
     }
     
     found_symbol = False
