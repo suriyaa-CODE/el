@@ -3,6 +3,7 @@ import google.generativeai as genai
 from rag_utils import load_documents, create_faiss_index, search
 from PIL import Image
 import os
+import re
 
 # 1. PAGE CONFIG (MUST BE FIRST)
 st.set_page_config(page_title="Election Voice Chatbot", layout="centered", page_icon="🗳️")
@@ -79,22 +80,28 @@ docs, index = init_rag()
 # 5. CORE FUNCTIONS
 def show_party_symbol(text, container):
     party_map = {
-        "BJP": ("bjp.png", "BJP Symbol - Lotus"),
-        "Congress": ("congress.png", "Congress Symbol - Hand"),
-        "DMK": ("dmk.png", "DMK Symbol - Rising Sun"),
-        "ADMK": ("admk.png", "ADMK Symbol - Two Leaves"),
-        "TVK": ("tvk.png", "TVK Symbol - Two Elephants"),
-        "NTK": ("ntk.png", "NTK Symbol - Microphone")
+        "BJP": "bjp.png", 
+        "Congress": "congress.png", 
+        "DMK": "dmk.png", 
+        "ADMK": "admk.jpg", 
+        "TVK": "tvk.png", 
+        "NTK": "ntk.jpg"
     }
     
-    for keyword, (img_file, caption) in party_map.items():
-        if keyword.lower() in text.lower():
+    found_symbol = False
+    for party, img_file in party_map.items():
+        if re.search(rf"\b{party}\b", text, re.IGNORECASE):
             path = f"symbols/{img_file}"
             if os.path.exists(path):
                 img = Image.open(path)
-                container.image(img, caption=caption, width=150)
-                return
-    container.empty()
+                container.image(img, width=150) # Removed caption as it's not in the new party_map structure
+                found_symbol = True
+                break
+            # else:
+            #     st.warning(f"Symbol file not found: {path}") # Optional: for debugging missing files
+    
+    if not found_symbol:
+        container.empty()
 
 def generate_response(user_input):
     system_prompt = """You are an Election Information Assistant. 
